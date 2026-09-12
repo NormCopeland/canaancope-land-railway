@@ -39,6 +39,9 @@ RUN mkdir -p /app/.seed/extensions \
  && cp -a /app/config /app/.seed/config \
  && cp -a /app/public /app/.seed/public
 
+# Extra pages shipped with this wrapper (served from public/ on the volume).
+COPY site/ /app/.seed/public/
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

@@ -37,6 +37,12 @@ A hash manifest at `/data/.seed-manifest` tracks what was last seeded.
 `config/version.txt` is rewritten each boot with `UPSTREAM_TAG` so the
 in-app update checker reports the right version.
 
+## Extra pages
+
+Anything under `site/` is copied into the shipped `public/` tree and seeded
+onto the volume like the engine's own files. `site/guide/index.html` is the
+owner's guide, served at `/guide`.
+
 ## Updating upstream
 
 The in-app updater (`update.sh`) does not work in a container. To update:
