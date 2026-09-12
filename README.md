@@ -58,15 +58,24 @@ The in-app updater (`update.sh`) does not work in a container. To update:
 
 ## Admin panel
 
-The admin panel has no authentication, so it is deliberately not given a
-public domain. It is reachable only inside the Railway project's private
-network at `<service>.railway.internal:9832`. Options if you need it:
+The admin panel has no authentication of its own, so the app service never
+gets a public route to port 9832. Instead `admin-proxy/` is deployed as a
+second Railway service: a Caddy reverse proxy with HTTP basic auth that
+forwards to the app over Railway's private network
+(`canaancope-land.railway.internal:9832`).
 
-- `railway ssh` into the service and use `curl` against `localhost:9832`.
-- Run a second service in the project (e.g. an SSH/VPN bastion or a
-  basic-auth reverse proxy) that forwards to the private address.
-- A Railway TCP proxy would expose it to the internet **without auth**; avoid
-  unless you put something in front of it.
+Requirements:
+
+- The app service must have `ADMIN_HOST=::` so the admin server listens on
+  IPv6 (Railway's private network is IPv6-only).
+- The proxy service is built from this repo with root directory
+  `admin-proxy`, and needs variables `ADMIN_USER` and `ADMIN_PASSWORD_HASH`
+  (bcrypt; generate with `htpasswd -nbB user pass | cut -d: -f2` or
+  `caddy hash-password`). Optional `ADMIN_UPSTREAM` overrides the target.
+
+Rotate the password by setting a new hash on the proxy service and
+redeploying it. Do not attach a TCP proxy or public domain directly to the
+app's port 9832.
 
 ## Backups
 
